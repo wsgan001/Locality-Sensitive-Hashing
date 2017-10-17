@@ -3,8 +3,27 @@ import sys
 import itertools
 
 
+def gen_sparse_matrix(input_data):
+    """
+    Gen
+    """
+    users = 103703
+    matrix = np.empty([17780, users], dtype=int)
+
+    for m in range(len(input_data)):
+        matrix[input_data[m][1]][input_data[m][0] - 1] = 1
+
+
 def min_hashing():
-    return None
+    num_hash = 25
+    h = np.empty([num_hash, 17770], dtype=int)
+
+    for i in range(num_hash):
+        h[i] = np.random.permutation(17770)
+
+
+def sparse_to_sig():
+    pass
 
 
 def lsh_algorithm():
@@ -37,6 +56,8 @@ def main():
 
     np.random.seed(seed=int(seed))
     input_data = np.load(route)
+
+    gen_sparse_matrix(input_data)
 
 
 if __name__ == '__main__':
