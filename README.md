@@ -24,5 +24,3 @@ LSH implmentation for Advances In Data Mining course at Leiden University.
 ⋅⋅* The average number of found pairs per minute,
 ..* code readability, elegance.
 
-#Folder Structure
-Coming soon
