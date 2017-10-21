@@ -1,45 +1,29 @@
 import numpy as np
 import sys
 import itertools
-from scipy import sparse
+from scipy import sparse 
 from time import time
 
 start_time = time()
 
 
-num_hash = 25
-users = 103703
-
-# seed = 1234
-# route = 'data/user_movie.npy'
-
-seed = sys.argv[1]
-route = sys.argv[2]
-
-# args
-np.random.seed(seed=int(seed))
-input_data = np.load(route)
 
 
-matrix = np.empty([17780, users], dtype=int)
+
+# users = 103703
+# matrix = np.empty([100, users], dtype=int)
 
 for m in range(len(input_data)):
     matrix[input_data[m][1]][input_data[m][0] - 1] = 1
+    # print(matrix[input_data][m][1])
 
-# return matrix
-
-
-# def min_hashing(num_hash):
+num_hash = 25
 
 h = np.empty([num_hash, 17770], dtype=int)
-
 for i in range(num_hash):
     h[i] = np.random.permutation(17770)
 
-# return h
 
-
-# def sparse_to_sig(num_hash, h):
 sig = np.empty([num_hash, 17770], dtype=int)
 for i in range(num_hash):
     counting = 0
@@ -53,8 +37,6 @@ for i in range(num_hash):
         else:
             break
 
-    # return sig
-
 
 def jsim(sig1, sig2, u1, u2):
     com = np.sum(sig1 == sig2)
@@ -62,10 +44,7 @@ def jsim(sig1, sig2, u1, u2):
     if sim > 0.5:
         sim_list[u1].append(u2)
 
-    # return sim_list
 
-
-# def lsh_algorithm(simlist):
 sim_list = [[] for x in range(users)]
 band = 5
 row = 5
@@ -87,10 +66,7 @@ for i in range(band):
                 jsim(sig[:, c], sig[:, d], c, d)
 real_count = 0
 
-# return simlist, real_count
 
-
-# def output(results):
 """
 Checking the real similarity and outputing the results
 """
