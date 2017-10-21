@@ -34,13 +34,42 @@ def loading(data):
 
 
 def minhashing(sparse_data, max_user_id, max_movie_id, user_seed):
+
     # Apply random permutation
     total_permutation = 100
 
-    pass
+    # allocate memory, force to int32, will only need to maximally count up to
+    # max user ID
+    signature_matrix = np.zeros(
+        (total_permutation, max_user_id).astype('int32'))
+
+    for i in range(total_permutation):
+        # set the random seed such that our results are repeatable, however we need to change each loop to obtain
+        # different permutations
+        random_seed = int(i * 242 / 2 + user_seed)
+        np.random.seed(random_seed)
+
+        # New row order according to the random permutaion
+        row_order = np.random.permutaion(max_user_id)
+        row_order = tuple(row_order)
+
+        # Swap the sparse matrix torws with the row_order
+        new_sparse = sparse_data[row_order, :]
+
+        # Find the position of the first '1' in each column and set the
+        # position values into the signature matrix
+        for j in range(max_user_id):
+            ar = new_sparse.indices[new_sparse.indptr[
+                j]:new_sparse.indptr[j + 1]].min()
+            signature_matrix[i, j] = ar
+
+    return {
+        'total_permutation': total_permutation,
+        'signature_matrix': signature_matrix,
+    }
 
 
-def cal_jaccards_similarity(usr1, usr2, sparse_matrix):
+def jaccards_similarity(usr1, usr2, sparse_matrix):
     sum_values = np.sum(sparse_matrix[:, usr1] & sparse_matrix[:, usr2])
     sim_values = np.sum(sparse_matrix[:, usr1] & sparse_matrix[:, usr2])
 
@@ -133,15 +162,13 @@ if __name__ == '__main__':
     # First Load the data and calculate the sparse matrix, max user etc.
     loadr = loading(data)
 
-    # args
-    np.random.seed(seed=int(seed))
-
     # Fetch the signature matrix results
     minhash = minhashing(loadr['sparse'], loadr['max_movie_id'],
-               loadr['max_user_id'], seed)
+                         loadr['max_user_id'], seed)
 
     # Fetch the LSH algorithm results
-    lsh_unique_set = lsh_algorithm(minhash['signature_matrix'], minhash['total_permutation'])
+    lsh_unique_set = lsh_algorithm(
+        minhash['signature_matrix'], minhash['total_permutation'])
 
     # Finally, create the results.txt file sand save it.
     output(original_sparse, lsh_unique_set)
