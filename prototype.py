@@ -4,6 +4,7 @@ import itertools
 from scipy import sparse
 from time import time
 import resource
+import os
 
 
 def loading(data):
@@ -27,7 +28,7 @@ def loading(data):
         (values, (row, col)), shape=(max_movie_id, max_user_id), dtype='b')
 
     return {
-        "sparse": sparse_data,
+        "sparse_data": sparse_data,
         "max_movie_id": max_movie_id,
         "max_user_id": max_user_id,
     }
@@ -143,9 +144,36 @@ def create_signature_similarity(usr1, usr2, signature_matrix):
 
 
 def output(original_sparse, unique_set):
-    file = open('results.txt', 'w')
-    for i in range(len(sim_list)):
-        pass
+    sparse_array = original_sparse.toarray()
+
+    original_unique_set = unique_set
+    unique_set = sorted(unique_set)
+
+    user_pair_list = []
+
+    for pair in unique_set:
+        if pair[0] < pair[1]:
+            sim = jaccards_similarity(pair[0], pair[1], sparse_array)
+            if sim > 0.5:
+                user_pair_list.append(pair[0] + 1, pair[1] + 1)
+        elif pair[0] > pair[1]:
+            if (pair[0], pair[1]) in original_unique_set:
+                continue
+            else:
+                sim = jaccards_similarity(pair[0], pair[1], sparse_array)
+                if sim > 0.5:
+                    user_pair_list.append(pair[1] + 1, pair[0] + 1)
+
+    user_pair_list = sorted(user_pair_list)
+
+    i = 0
+    while os.path.exists('results/run%s' % i):
+        i += 1
+
+    with open('results/run%s.txt', 'w') as f:
+        f.write('\n'.join('%s,%s' % user_pair for user_pair in user_pair_list))
+    f.close()
+    print('user pairs found with similarity larger than 0.5', len(user_pair_list))
 
 
 if __name__ == '__main__':
@@ -163,12 +191,14 @@ if __name__ == '__main__':
     loadr = loading(data)
 
     # Fetch the signature matrix results
-    minhash = minhashing(loadr['sparse'], loadr['max_movie_id'],
+    minhash = minhashing(loadr['sparse_data'], loadr['max_movie_id'],
                          loadr['max_user_id'], seed)
 
     # Fetch the LSH algorithm results
     lsh_unique_set = lsh_algorithm(
         minhash['signature_matrix'], minhash['total_permutation'])
+
+    original_sparse = loadr['sparse_data']
 
     # Finally, create the results.txt file sand save it.
     output(original_sparse, lsh_unique_set)
