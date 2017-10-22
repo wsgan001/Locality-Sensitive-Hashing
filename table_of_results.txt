@@ -1,0 +1,31 @@
+running with seed 54210 produces the following
+----------------------------------------------
+User-Pair found:353 
+Run time (seconds): 237
+Mem: 3648 MB
+
+
+Running with seed of 40 produces the following 
+---------------------------------------------
+User-Pair found: 389
+Run time (seconds): 372.93
+Mem: 3658 MB
+
+Running with seed of 60 produces the following 
+----------------------------------------------
+User-Pair found:475 
+Runtime (seconds): 471
+Mem: 3661 MB
+
+Running with seed of 200 produces the following 
+----------------------------------------------
+User-Pair found:716 
+Runtime (seconds): 371
+Mem: 3661 MB
+
+
+Running with seed of 15 produces the following 
+----------------------------------------------
+User-Pair found:566 
+Runtime (seconds): 271
+Mem: 3654 MB
